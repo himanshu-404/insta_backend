@@ -1,28 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const { Server } = require("socket.io");
-const mongoose = require("mongoose");
 require("dotenv").config();
+require("./config/dbConnection");
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
-(async function () {
-  try {
-    mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connected to database");
-  } catch (err) {
-    console.log(err);
-  }
-})();
-
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.send("Wel-come to the server");
 });
 
 app.use("/", require("./routes"));
