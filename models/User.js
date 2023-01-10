@@ -2,57 +2,60 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
-const RequestError = require("../errorTypes/RequestError");
-
-const UserSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-  },
-  fullName: {
-    type: String,
-    required: true,
-  },
-  username: {
-    type: String,
-    required: true,
-    lowercase: true,
-    unique: true,
-    minlength: 3,
-  },
-  password: {
-    type: String,
-    minlength: 8,
-  },
-  avatar: String,
-  bio: {
-    type: String,
-    maxlength: 130,
-  },
-  website: {
-    type: String,
-    maxlength: 65,
-  },
-  bookmarks: [
-    {
-      post: {
-        type: Schema.ObjectId,
-        ref: "Post",
-      },
+const UserSchema = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
     },
-  ],
-  githubId: Number,
-  private: {
-    type: Boolean,
-    default: false,
+    fullName: {
+      type: String,
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+      minlength: 3,
+    },
+    password: {
+      type: String,
+      minlength: 8,
+    },
+    avatar: String,
+    bio: {
+      type: String,
+      maxlength: 130,
+    },
+    website: {
+      type: String,
+      maxlength: 65,
+    },
+    bookmarks: [
+      {
+        post: {
+          type: Schema.ObjectId,
+          ref: "Post",
+        },
+      },
+    ],
+    githubId: Number,
+    private: {
+      type: Boolean,
+      default: false,
+    },
+    confirmed: {
+      type: Boolean,
+      default: false,
+    },
   },
-  confirmed: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 UserSchema.pre("save", function (next) {
   const saltRounds = 10;
