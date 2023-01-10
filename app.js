@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
   res.send("Wel-come to the server");
 });
 
-app.use("/", require("./routes"));
+app.use("/api", require("./routes"));
 
 const server = app.listen(3000, () => {
   console.log("Server is running on port 3000");
