@@ -1,6 +1,6 @@
 const { responseError, responseMessage } = require("../config/commonFunction");
 const joi = require("joi");
-const { loginUser, registerUser } = require("../functions/users");
+const { loginUser, registerUser } = require("../functions/auth");
 
 const userLogin = async (req, res) => {
   try {
