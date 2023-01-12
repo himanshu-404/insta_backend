@@ -7,7 +7,7 @@ const followersSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    followers: [
+    follower: [
       {
         user: {
           type: mongoose.Schema.ObjectId,

@@ -13,9 +13,7 @@ const verifyToken = async (req, res, next) => {
       //decodes token id
       const decoded = jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
         if (err) {
-          return res.status(401).json({
-            message: "invalid token",
-          });
+          return false;
         }
         return data;
       });

@@ -22,5 +22,6 @@ const server = app.listen(3000, () => {
 const io = new Server(server, { cors: { origin: "*" } });
 
 global.socketIo = io;
-const { connection } = require("./socketIo");
+const { connection, socketMiddleware } = require("./socketIo");
 io.on("connection", connection);
+io.use(socketMiddleware);
