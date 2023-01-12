@@ -3,6 +3,7 @@ const Followers = require("../models/Followers");
 const Following = require("../models/Following");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const checkUserById = async (user_id) => {
   try {
@@ -107,6 +108,85 @@ const followOrUnFollowUser = async (req, res) => {
   }
 };
 
+const retrieveRelatedUsers = async (req, res, type) => {
+  try {
+    const { userId, offset = 0 } = req.params;
+    const loginUser = req.user;
+
+    const pipeline = [
+      {
+        $match: { user: ObjectId(userId) },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let:
+            type == "followers"
+              ? { userIds: "$follower.user" }
+              : { userIds: "$following.user" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ["$_id", "$$userIds"] },
+              },
+            },
+            {
+              $skip: Number(offset),
+            },
+            {
+              $limit: 10,
+            },
+          ],
+          as: "users",
+        },
+      },
+      {
+        $lookup: {
+          from: "followers",
+          localField: "users._id",
+          foreignField: "user",
+          as: "userFollowers",
+        },
+      },
+      {
+        $project: {
+          "users._id": true,
+          "users.username": true,
+          "users.avatar": true,
+          "users.fullName": true,
+          userFollowers: true,
+        },
+      },
+    ];
+
+    const aggregation =
+      type == "followers"
+        ? await Followers.aggregate(pipeline)
+        : await Following.aggregate(pipeline);
+
+    const followedUsers = new Set();
+
+    aggregation[0].userFollowers.forEach((followingUser) => {
+      if (
+        !!followingUser.follower.find(
+          (follower) => String(follower.user) === String(loginUser)
+        )
+      ) {
+        followedUsers.add(String(followingUser.user));
+      }
+    });
+
+    aggregation[0].users.forEach((userData) => {
+      userData.isFollowing = followedUsers.has(String(userData._id));
+    });
+
+    return res.send(aggregation[0].users);
+  } catch (error) {
+    return responseError(res, error);
+  }
+};
+
 module.exports = {
   followOrUnFollowUser,
+  retrieveRelatedUsers,
 };
