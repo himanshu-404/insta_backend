@@ -7,5 +7,6 @@ routes.post("/:userId/follow", userControllers.followUser);
 
 routes.post("/:userId/:offset/followers", userControllers.getFollowersByUserId);
 routes.post("/:userId/:offset/following", userControllers.getFollowingByUserId);
+routes.post("/suggested/:max?", userControllers.suggestedUser);
 
 module.exports = routes;

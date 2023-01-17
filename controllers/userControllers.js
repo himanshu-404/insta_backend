@@ -3,6 +3,7 @@ const joi = require("joi");
 const {
   followOrUnFollowUser,
   retrieveRelatedUsers,
+  retrieveSuggestedUsers,
 } = require("../functions/user");
 
 const followUser = async (req, res) => {
@@ -49,6 +50,7 @@ const getFollowersByUserId = async (req, res) => {
     return responseError(res, error);
   }
 };
+
 const getFollowingByUserId = async (req, res) => {
   try {
     const validateBody = joi.object({
@@ -72,8 +74,17 @@ const getFollowingByUserId = async (req, res) => {
   }
 };
 
+const suggestedUser = async (req, res) => {
+  try {
+    return await retrieveSuggestedUsers(req, res);
+  } catch (error) {
+    return responseError(res, error);
+  }
+};
+
 module.exports = {
   followUser,
   getFollowersByUserId,
   getFollowingByUserId,
+  suggestedUser,
 };

@@ -186,7 +186,61 @@ const retrieveRelatedUsers = async (req, res, type) => {
   }
 };
 
+const retrieveSuggestedUsers = async (req, res) => {
+  try {
+    const { max } = req.params;
+    const loginUser = req.user;
+
+    console.log("max :>> ", max);
+
+    const users = await User.aggregate([
+      {
+        $match: { _id: { $ne: ObjectId(loginUser) } },
+      },
+      {
+        $lookup: {
+          from: "followers",
+          localField: "_id",
+          foreignField: "user",
+          as: "followers",
+        },
+      },
+      {
+        $unwind: "$followers",
+      },
+      {
+        $project: {
+          username: true,
+          fullName: true,
+          email: true,
+          avatar: true,
+          isFollowing: {
+            $in: [ObjectId(loginUser), "$followers.follower.user"],
+          },
+        },
+      },
+      {
+        $match: { isFollowing: false },
+      },
+      {
+        $sample: { size: max ? Number(max) : 20 },
+      },
+      {
+        $sort: { posts: -1 },
+      },
+      {
+        $unset: ["isFollowing"],
+      },
+    ]);
+
+    res.send(users);
+  } catch (error) {
+    return responseError(res, error);
+  }
+};
+
 module.exports = {
   followOrUnFollowUser,
   retrieveRelatedUsers,
+  retrieveSuggestedUsers,
 };
