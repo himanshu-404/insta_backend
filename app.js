@@ -13,6 +13,8 @@ app.get("/", (req, res) => {
   res.send("Wel-come to the server");
 });
 
+app.use(`/images`, express.static(__dirname + "/images"));
+
 app.use("/api", require("./routes"));
 
 const server = app.listen(3000, () => {
